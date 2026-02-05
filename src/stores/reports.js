@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase/client'
 
+import { getJuzFromSurahAndAyat, getSurahAndAyatFromJuz } from '../utils/juzCalculator'
+
 export const useReportsStore = defineStore('reports', () => {
   // State
   const reports = ref([])
@@ -52,81 +54,112 @@ export const useReportsStore = defineStore('reports', () => {
     }
   }
 
-  const createReport = async (reportData) => {
-    try {
-      isLoading.value = true
-      error.value = null
-  
-      const { data, error: supabaseError } = await supabase
-        .from('reports')
-        .insert([{
-          user_id: reportData.user_id,
-          report_type: reportData.report_type,
-          juz: reportData.juz,
-          surah_name: reportData.surah_name,
-          ayat_start: reportData.ayat_start,
-          ayat_end: reportData.ayat_end,
-          notes: reportData.notes // ← tambah ini
-        }])
-        .select()
-        .single()
-  
-      if (supabaseError) throw supabaseError
-      
-      reports.value.unshift(data)
-      return { success: true, data }
-    } catch (err) {
-      console.error('Error creating report:', err)
-      error.value = err.message
-      return { success: false, error: err.message }
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const clearError = () => {
+const createReport = async (reportData) => {
+  try {
+    isLoading.value = true
     error.value = null
-  }
 
-  // Tambahkan actions setelah createReport:
+    let processedData = { ...reportData }
 
-const updateReport = async (reportId, reportData) => {
-    try {
-      isLoading.value = true
-      error.value = null
-  
-      const { data, error: supabaseError } = await supabase
-        .from('reports')
-        .update({
-          report_type: reportData.report_type,
-          juz: reportData.juz,
-          surah_name: reportData.surah_name,
-          ayat_start: reportData.ayat_start,
-          ayat_end: reportData.ayat_end,
-          notes: reportData.notes,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', reportId)
-        .select()
-        .single()
-  
-      if (supabaseError) throw supabaseError
-      
-      // Update local state
-      const index = reports.value.findIndex(r => r.id === reportId)
-      if (index !== -1) {
-        reports.value[index] = data
-      }
-      
-      return { success: true, data }
-    } catch (err) {
-      console.error('Error updating report:', err)
-      error.value = err.message
-      return { success: false, error: err.message }
-    } finally {
-      isLoading.value = false
+    // Jika report type adalah surah, hitung juz secara otomatis
+    if (reportData.report_type === 'surah' && reportData.surah_name && reportData.ayat_end) {
+      processedData.juz = getJuzFromSurahAndAyat(
+        reportData.surah_name, 
+        reportData.ayat_end
+      )
     }
+    
+    // Jika report type adalah juz, tentukan surah dan ayat terakhir
+    if (reportData.report_type === 'juz' && reportData.juz) {
+      const juzInfo = getSurahAndAyatFromJuz(reportData.juz)
+      processedData.surah_name = juzInfo.surahName
+      processedData.ayat_start = juzInfo.ayatStart
+      processedData.ayat_end = juzInfo.ayatEnd
+    }
+
+    const { data, error: supabaseError } = await supabase
+      .from('reports')
+      .insert([{
+        user_id: processedData.user_id,
+        report_type: processedData.report_type,
+        juz: processedData.juz,
+        surah_name: processedData.surah_name,
+        ayat_start: processedData.ayat_start,
+        ayat_end: processedData.ayat_end,
+        notes: processedData.notes,
+        // Tambah created_at untuk sorting
+        created_at: new Date().toISOString()
+      }])
+      .select()
+      .single()
+
+    if (supabaseError) throw supabaseError
+    
+    reports.value.unshift(data)
+    return { success: true, data }
+  } catch (err) {
+    console.error('Error creating report:', err)
+    error.value = err.message
+    return { success: false, error: err.message }
+  } finally {
+    isLoading.value = false
   }
+}
+
+// Update juga updateReport function dengan logika yang sama
+const updateReport = async (reportId, reportData) => {
+  try {
+    isLoading.value = true
+    error.value = null
+
+    let processedData = { ...reportData }
+
+    // Logika auto-calculate yang sama
+    if (reportData.report_type === 'surah' && reportData.surah_name && reportData.ayat_end) {
+      processedData.juz = getJuzFromSurahAndAyat(
+        reportData.surah_name, 
+        reportData.ayat_end
+      )
+    }
+    
+    if (reportData.report_type === 'juz' && reportData.juz) {
+      const juzInfo = getSurahAndAyatFromJuz(reportData.juz)
+      processedData.surah_name = juzInfo.surahName
+      processedData.ayat_start = juzInfo.ayatStart
+      processedData.ayat_end = juzInfo.ayatEnd
+    }
+
+    const { data, error: supabaseError } = await supabase
+      .from('reports')
+      .update({
+        report_type: processedData.report_type,
+        juz: processedData.juz,
+        surah_name: processedData.surah_name,
+        ayat_start: processedData.ayat_start,
+        ayat_end: processedData.ayat_end,
+        notes: processedData.notes,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', reportId)
+      .select()
+      .single()
+
+    if (supabaseError) throw supabaseError
+    
+    const index = reports.value.findIndex(r => r.id === reportId)
+    if (index !== -1) {
+      reports.value[index] = data
+    }
+    
+    return { success: true, data }
+  } catch (err) {
+    console.error('Error updating report:', err)
+    error.value = err.message
+    return { success: false, error: err.message }
+  } finally {
+    isLoading.value = false
+  }
+}
   
   const deleteReport = async (reportId) => {
     try {
@@ -170,7 +203,6 @@ const updateReport = async (reportId, reportData) => {
     // Actions
     fetchUserReports,
     createReport,
-    clearError,
     updateReport,
     deleteReport,
   }

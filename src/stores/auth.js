@@ -31,21 +31,27 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Tambahkan di actions:
   const fetchAllUsers = async () => {
-    try {
-      const { data, error: supabaseError } = await supabase
-        .from('users')
-        .select('id, username, created_at')
-        .order('username', { ascending: true })
+  try {
+    const { data, error: supabaseError } = await supabase
+      .from('users')
+      .select('id, username, created_at') // Hapus full_name, avatar_url
+      .order('username', { ascending: true })
 
-      if (supabaseError) throw supabaseError
-      users.value = data || []
-      return data
-    } catch (err) {
-      console.error('Error fetching users:', err)
-      error.value = err.message
-      return []
-    }
+    if (supabaseError) throw supabaseError
+    
+    // Tambah field default jika diperlukan
+    users.value = (data || []).map(user => ({
+      ...user,
+      full_name: user.username, // Fallback ke username
+      avatar_url: null
+    }))
+    return data
+  } catch (err) {
+    console.error('Error fetching users:', err)
+    error.value = err.message
+    return []
   }
+}
 
   const login = async (username) => {
     try {
