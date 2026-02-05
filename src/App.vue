@@ -1,30 +1,35 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div id="app" class="min-h-screen bg-gray-50">
+    <!-- Loading overlay -->
+    <div v-if="isInitializing" class="fixed inset-0 bg-white/80 flex items-center justify-center z-50">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+        <p class="text-gray-600">Memuat aplikasi...</p>
+      </div>
+    </div>
+
+    <!-- Main app content -->
+    <router-view v-else />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '../src/stores/auth'
+
+const authStore = useAuthStore()
+const isInitializing = ref(true)
+
+onMounted(async () => {
+  // Inisialisasi auth saat app pertama kali load
+  await authStore.initializeAuth()
+  
+  // Fetch semua user untuk dropdown
+  await authStore.fetchAllUsers()
+  
+  // Beri sedikit delay untuk smooth loading
+  setTimeout(() => {
+    isInitializing.value = false
+  }, 500)
+})
+</script>
