@@ -282,6 +282,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { useAuthStore } from '../stores/auth'
 import { useReportsStore } from '../stores/reports'
 import { surahs as allSurahs, juzRanges } from '../utils/surahData'
@@ -291,6 +292,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const reportsStore = useReportsStore()
+const toast = useToast()
 
 // State
 const inputMode = ref('juz')
@@ -477,7 +479,7 @@ const resetForm = () => {
 
 const submitReport = async () => {
   if (!isFormValid.value) {
-    alert('Harap isi form dengan benar')
+    toast.error('Harap isi form dengan benar');
     return
   }
 
@@ -517,7 +519,7 @@ const submitReport = async () => {
     }
 
     if (result.success) {
-      alert(isEditMode.value ? '✅ Laporan berhasil diperbarui!' : '✅ Laporan berhasil disimpan!')
+      toast.success(isEditMode.value ? 'Laporan berhasil diperbarui!' : 'Laporan berhasil disimpan!');
 
       if (isEditMode.value) {
         router.push('/edit')
@@ -526,11 +528,11 @@ const submitReport = async () => {
         await loadRecentReports()
       }
     } else {
-      alert('❌ Gagal menyimpan laporan: ' + result.error)
+      toast.error('Gagal menyimpan laporan: ' + result.error);
     }
   } catch (error) {
     console.error('Submit error:', error)
-    alert('❌ Terjadi kesalahan saat menyimpan laporan')
+    toast.error('Terjadi kesalahan saat menyimpan laporan');
   } finally {
     isSubmitting.value = false
   }

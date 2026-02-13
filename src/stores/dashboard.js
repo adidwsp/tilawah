@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '../supabase/client'
+import { getJuzFromSurahAndAyat } from '../utils/juzCalculator'
 
 export const useDashboardStore = defineStore('dashboard', () => {
   // State
@@ -17,13 +18,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       isLoading.value = true
       error.value = null
 
-      // Get today's date range
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const tomorrow = new Date(today)
-      tomorrow.setDate(tomorrow.getDate() + 1)
-
-      // 1. Get user's reports
+      // 1. Get user's reports, sorted by most recent first
       const { data: reports, error: reportsError } = await supabase
         .from('reports')
         .select('*')
@@ -32,28 +27,43 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
       if (reportsError) throw reportsError
 
-      // 2. Calculate stats
-      const totalJuz = reports
+      if (!reports || reports.length === 0) {
+        // Handle case where user has no reports yet
+        userStats.value = { completedJuz: 0, totalJuz: 30, progressPercentage: 0, averageDaily: '0.0', targetDaily: '1.0', estimatedDays: 30, totalReports: 0 };
+        weeklyActivity.value = Array(7).fill({}).map((_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - (6 - i));
+            return { day: date.toLocaleDateString('id-ID', { weekday: 'short' }), juz: 0, active: false, height: 0 };
+        });
+        todaySummary.value = { juz: 0, lastUpdate: '-', lastSurah: '-' };
+        return { success: true, data: userStats.value };
+      }
+
+      // 2. Determine Current Progress (completedJuz) from the most recent report
+      const lastReport = reports[0];
+      let completedJuz = 0;
+      if (lastReport.report_type === 'juz') {
+        completedJuz = lastReport.juz;
+      } else if (lastReport.report_type === 'surah') {
+        completedJuz = getJuzFromSurahAndAyat(lastReport.surah_name, lastReport.ayat_end);
+      }
+
+      // 3. Calculate Historical Stats for Average Daily Reading
+      const totalJuzForAverage = reports
         .filter(r => r.report_type === 'juz')
         .reduce((sum, r) => sum + (r.juz || 0), 0)
 
       const totalReports = reports.length
-      
-      // Average daily juz (based on days active)
+
       const firstReport = reports[reports.length - 1]
       let dailyAverage = 0
       if (firstReport) {
         const firstDate = new Date(firstReport.created_at)
         const daysActive = Math.max(1, Math.ceil((new Date() - firstDate) / (1000 * 60 * 60 * 24)))
-        dailyAverage = totalJuz / daysActive
+        dailyAverage = totalJuzForAverage / daysActive
       }
 
-      // Today's reports
-      const todayReports = reports.filter(r => 
-        new Date(r.created_at) >= today && new Date(r.created_at) < tomorrow
-      )
-
-      // Last 7 days activity for chart
+      // 4. Last 7 days activity for chart
       const weeklyData = []
       for (let i = 6; i >= 0; i--) {
         const date = new Date()
@@ -79,23 +89,23 @@ export const useDashboardStore = defineStore('dashboard', () => {
         })
       }
 
-      // Today's summary
-      const lastTodayReport = todayReports[0]
+      // 5. Synchronized Summary Data from the single latest report
       const todaySummaryData = {
-        juz: todayReports.filter(r => r.report_type === 'juz').reduce((sum, r) => sum + (r.juz || 0), 0),
-        lastUpdate: lastTodayReport ? formatTime(lastTodayReport.created_at) : '-',
-        lastSurah: lastTodayReport?.report_type === 'surah' ? lastTodayReport.surah_name : '-'
-      }
+        juz: lastReport.juz,
+        lastUpdate: lastReport.created_at,
+        lastSurah: lastReport.surah_name ? `${lastReport.surah_name}:${lastReport.ayat_end}` : '-',
+      };
 
-      // Estimated days to complete
-      const remainingJuz = Math.max(0, 30 - totalJuz)
+      // 6. Calculate remaining stats based on new completedJuz
+      const remainingJuz = Math.max(0, 30 - completedJuz)
       const estimatedDays = dailyAverage > 0 ? Math.ceil(remainingJuz / dailyAverage) : 30
-      const targetDaily = 30 / 30 // Default: 1 juz per day
+      const targetDaily = 1.0 // 1 juz per day
 
+      // 7. Update state
       userStats.value = {
-        completedJuz: totalJuz,
+        completedJuz: completedJuz,
         totalJuz: 30,
-        progressPercentage: Math.min(100, (totalJuz / 30) * 100),
+        progressPercentage: Math.min(100, (completedJuz / 30) * 100),
         averageDaily: dailyAverage.toFixed(1),
         targetDaily: targetDaily.toFixed(1),
         estimatedDays: estimatedDays,
@@ -187,16 +197,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
       console.error('Error fetching user rank:', err)
       return null
     }
-  }
-
-  // Helper function
-  const formatTime = (dateString) => {
-    if (!dateString) return '-'
-    const date = new Date(dateString)
-    return date.toLocaleTimeString('id-ID', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
   }
 
   return {

@@ -52,7 +52,7 @@
 
       <div v-else>
         <!-- Today's Stats -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
+        <!-- <div class="grid grid-cols-2 gap-4 mb-6">
           <div class="card bg-white transform hover:scale-[1.02] transition-all duration-200">
             <div class="flex items-center gap-3">
               <div class="bg-emerald-100 p-3 rounded-xl">
@@ -61,7 +61,7 @@
                 </svg>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Juz Hari Ini</p>
+                <p class="text-sm text-gray-500">Juz Terakhir</p>
                 <p class="text-2xl font-bold">{{ todaySummary.juz || '0' }}</p>
               </div>
             </div>
@@ -75,7 +75,7 @@
                 </svg>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Rank Anda</p>
+                <p class="text-sm text-gray-500">Peringkat Anda</p>
                 <p class="text-2xl font-bold" v-if="userRank">#{{ userRank }}</p>
                 <p class="text-2xl font-bold" v-else>-</p>
               </div>
@@ -91,7 +91,7 @@
               </div>
               <div>
                 <p class="text-sm text-gray-500">Terakhir Update</p>
-                <p class="text-lg font-semibold">{{ todaySummary.lastUpdate || '-' }}</p>
+                <p class="text-sm font-semibold">{{ todaySummary.lastUpdate ? new Date(todaySummary.lastUpdate).toLocaleString('id-ID') + ' WIB' : '-' }}</p>
               </div>
             </div>
           </div>
@@ -105,11 +105,80 @@
               </div>
               <div>
                 <p class="text-sm text-gray-500">Surah Terakhir</p>
-                <p class="text-lg font-semibold">{{ todaySummary.lastSurah || '-' }}</p>
+                <p class="text-sm font-semibold">{{ todaySummary.lastSurah || '-' }}</p>
               </div>
             </div>
           </div>
+        </div> -->
+
+        <!-- Today's Stats dengan Responsive Mobile -->
+  <div class="grid grid-cols-2 gap-3 md:gap-4 mb-6">
+    <!-- Juz Terakhir -->
+    <div class="card bg-white transform hover:scale-[1.02] transition-all duration-200">
+      <div class="flex items-center gap-2 sm:gap-3 mobile:justify-center mobile:text-center">
+        <!-- Icon disembunyikan di layar < 340px -->
+        <div class="bg-emerald-100 p-2 sm:p-3 rounded-xl hide-on-mobile-small">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
         </div>
+        <div class="min-w-0">
+          <p class="text-xs sm:text-sm text-gray-500">Juz Terakhir</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-800">{{ todaySummary.juz || '0' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Peringkat Anda -->
+    <div class="card bg-white transform hover:scale-[1.02] transition-all duration-200">
+      <div class="flex items-center gap-2 sm:gap-3 mobile:justify-center mobile:text-center">
+        <div class="bg-blue-100 p-2 sm:p-3 rounded-xl hide-on-mobile-small">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <p class="text-xs sm:text-sm text-gray-500">Peringkat Anda</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-800" v-if="userRank">#{{ userRank }}</p>
+          <p class="text-xl sm:text-2xl font-bold text-gray-800" v-else>-</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terakhir Update -->
+    <div class="card bg-white transform hover:scale-[1.02] transition-all duration-200">
+      <div class="flex items-center gap-2 sm:gap-3 mobile:justify-center mobile:text-center">
+        <div class="bg-purple-100 p-2 sm:p-3 rounded-xl hide-on-mobile-small">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs sm:text-sm text-gray-500">Terakhir Update</p>
+          <p class="text-xs sm:text-sm font-semibold text-gray-700 truncate">
+            {{ formatLastUpdate(todaySummary.lastUpdate) }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Surah Terakhir -->
+    <div class="card bg-white transform hover:scale-[1.02] transition-all duration-200">
+      <div class="flex items-center gap-2 sm:gap-3 mobile:justify-center mobile:text-center">
+        <div class="bg-amber-100 p-2 sm:p-3 rounded-xl hide-on-mobile-small">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+          </svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs sm:text-sm text-gray-500">Surah Terakhir</p>
+          <p class="text-xs sm:text-sm font-semibold text-gray-700 truncate">
+            {{ todaySummary.lastSurah || '-' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 
         <!-- Progress Section -->
         <div class="card mb-6">
@@ -368,6 +437,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useDashboardStore } from '../stores/dashboard'
+import HijriDate from 'hijri-date'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -393,7 +463,6 @@ const user = computed(() => authStore.user)
 
 // Date calculations
 const hijriDate = computed(() => {
-  // Using hijri-date library - ensure proper formatting
   const months = [
     'Muharram', 'Safar', 'Rabiul Awal', 'Rabiul Akhir',
     'Jumadil Awal', 'Jumadil Akhir', 'Rajab', "Sya'ban",
@@ -401,7 +470,6 @@ const hijriDate = computed(() => {
   ]
   
   try {
-    const HijriDate = require('hijri-date')
     const hijri = new HijriDate()
     return {
       day: hijri.getDate(),
@@ -411,7 +479,7 @@ const hijriDate = computed(() => {
   } catch {
     // Fallback if library fails
     return {
-      day: 17,
+      day: 1,
       month: "Sya'ban",
       year: 1447
     }
@@ -433,6 +501,35 @@ const gregorianDate = computed(() => {
   
   return `${dayName}, ${date} ${month} ${year}`
 })
+
+// Format last update dengan human readable & compact
+const formatLastUpdate = (dateString) => {
+  if (!dateString) return '-';
+  
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Baru saja';
+  if (diffMins < 60) return `${diffMins} mnt`;
+  if (diffHours < 24) return `${diffHours} jam`;
+  if (diffDays === 1) return 'Kemarin';
+  if (diffDays < 7) return `${diffDays} hr`;
+  
+  // Format pendek: 12 Mar, 14:30
+  return date.toLocaleDateString('id-ID', { 
+    day: 'numeric', 
+    month: 'short', 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  }).replace(',', '');
+}
+
+
+
 
 // Dashboard data from store
 const userStats = computed(() => dashboardStore.userStats)
@@ -552,6 +649,7 @@ const checkRamadhanActivity = () => {
   return today >= ramadhanStart && today <= ramadhanEnd
 }
 
+
 const loadDashboardData = async () => {
   if (!authStore.user?.id) return
   
@@ -596,11 +694,51 @@ onMounted(async () => {
     if (authStore.user?.id) {
       await loadDashboardData()
     }
-  }, 120000)
+  }, 180000)
 })
 </script>
 
 <style scoped>
+/* Responsive untuk mobile kecil (lebar <= 340px) */
+@media (max-width: 340px) {
+  .hide-on-mobile-small {
+    display: none !important;
+  }
+  
+  .mobile\:justify-center {
+    justify-content: center !important;
+  }
+  
+  .mobile\:text-center {
+    text-align: center !important;
+  }
+
+  /* Sesuaikan padding card */
+  .card {
+    @apply p-3;
+  }
+}
+
+/* Utility truncate */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Perbaikan umum untuk mobile */
+@media (max-width: 640px) {
+  .grid-cols-2 {
+    gap: 0.75rem;
+  }
+  
+  .card {
+    @apply p-3;
+  }
+}
+
+
 .card {
   @apply bg-white rounded-2xl shadow-lg p-4 border border-gray-100;
 }
