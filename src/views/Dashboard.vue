@@ -8,7 +8,7 @@
         <!-- User Info & Logout -->
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h1 class="text-2xl font-bold">Khabar Qurma</h1>
+            <h1 class="text-2xl font-bold">Khatam Bareng Skrt</h1>
             <p class="text-emerald-100">Selamat datang, {{ user?.username || 'User' }}</p>
           </div>
           <button 
@@ -379,7 +379,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Laporkan Tilawah
+            Catat Tilawah
           </button>
         </div>
       </div>
@@ -405,7 +405,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="text-xs mt-1">Lapor</span>
+          <span class="text-xs mt-1">Catat</span>
         </router-link>
 
         <router-link 

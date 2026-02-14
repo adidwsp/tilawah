@@ -12,8 +12,8 @@
             </svg>
           </button>
           <div>
-            <h1 class="text-2xl font-bold">Kelola Laporan</h1>
-            <p class="text-emerald-100">Edit atau hapus laporan tilawah Anda</p>
+            <h1 class="text-2xl font-bold">Kelola Catatan</h1>
+            <p class="text-emerald-100">Edit atau hapus catatan tilawah Anda</p>
           </div>
         </div>
 
@@ -21,7 +21,7 @@
         <div class="flex justify-around text-center">
           <div>
             <div class="text-2xl font-bold">{{ userStats.totalReports }}</div>
-            <div class="text-sm text-emerald-100">Total Laporan</div>
+            <div class="text-sm text-emerald-100">Total Catatan</div>
           </div>
           <div>
             <div class="text-2xl font-bold">{{ userStats.totalJuz }}</div>
@@ -68,7 +68,7 @@
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-8">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p class="text-gray-600">Memuat laporan Anda...</p>
+        <p class="text-gray-600">Memuat catatan Anda...</p>
       </div>
 
       <!-- Empty State -->
@@ -77,10 +77,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 class="text-xl font-bold text-gray-700 mb-2">Belum ada laporan</h3>
-        <p class="text-gray-500 mb-6">Anda belum membuat laporan tilawah.</p>
+        <h3 class="text-xl font-bold text-gray-700 mb-2">Belum ada catatan</h3>
+        <p class="text-gray-500 mb-6">Anda belum membuat catatan tilawah.</p>
         <button @click="goToReport" class="btn-primary px-6 py-2">
-          Buat Laporan Pertama
+          Buat Catatan Pertama
         </button>
       </div>
 
@@ -163,7 +163,7 @@
       <div v-if="filteredReports.length > 0" class="fixed bottom-20 left-0 right-0 px-4">
         <div class="bg-white rounded-2xl shadow-lg p-4 flex justify-between items-center">
           <div class="text-sm text-gray-600">
-            {{ filteredReports.length }} laporan
+            {{ filteredReports.length }} catatan
           </div>
           <div class="flex gap-2">
             <button @click="goToReport"
@@ -189,7 +189,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="text-xs mt-1">Lapor</span>
+          <span class="text-xs mt-1">Catat</span>
         </router-link>
 
         <router-link to="/timeline" class="flex flex-col items-center text-gray-500 hover:text-primary">
@@ -334,16 +334,16 @@ const getJuzRange = (juz) => {
 }
 
 const deleteReport = async (report) => {
-  if (!confirm(`Apakah Anda yakin ingin menghapus laporan ini?\n\n${report.report_type === 'juz' ? `Juz ${report.juz}` : `${report.surah_name} ayat 1-${report.ayat_end}`}`)) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus catatan ini?\n\n${report.report_type === 'juz' ? `Juz ${report.juz}` : `${report.surah_name} ayat 1-${report.ayat_end}`}`)) {
     return
   }
 
   const result = await reportsStore.deleteReport(report.id)
 
   if (result.success) {
-    alert('✅ Laporan berhasil dihapus')
+    alert('✅ Catatan berhasil dihapus')
   } else {
-    alert('❌ Gagal menghapus laporan: ' + result.error)
+    alert('❌ Gagal menghapus catatan: ' + result.error)
   }
 }
 

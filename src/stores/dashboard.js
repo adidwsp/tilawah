@@ -35,7 +35,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             date.setDate(date.getDate() - (6 - i));
             return { day: date.toLocaleDateString('id-ID', { weekday: 'short' }), juz: 0, active: false, height: 0 };
         });
-        todaySummary.value = { juz: 0, lastUpdate: '-', lastSurah: '-' };
+        todaySummary.value = { juz: 0, lastUpdate: null, lastSurah: '-' };
         return { success: true, data: userStats.value };
       }
 

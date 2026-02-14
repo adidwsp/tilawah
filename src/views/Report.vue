@@ -12,7 +12,7 @@
             </svg>
           </button>
           <div>
-            <h1 class="text-2xl font-bold">{{ isEditMode ? 'Edit Laporan' : 'Lapor Tilawah' }}</h1>
+            <h1 class="text-2xl font-bold">{{ isEditMode ? 'Edit Catatan' : 'Catat Tilawah' }}</h1>
             <p class="text-emerald-100">{{ isEditMode ? 'Edit progress tilawah Anda' : 'Catat progress tilawah Anda' }}
             </p>
           </div>
@@ -46,7 +46,7 @@
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
-              <span>Lapor Juz</span>
+              <span>Catat Juz</span>
             </div>
           </button>
 
@@ -203,13 +203,13 @@
           <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
-          {{ isSubmitting ? 'Menyimpan...' : (isEditMode ? 'Perbarui Laporan' : 'Simpan Laporan') }}
+          {{ isSubmitting ? 'Menyimpan...' : (isEditMode ? 'Perbarui Catatan' : 'Simpan Catatan') }}
         </div>
       </button>
 
       <!-- Recent Reports -->
       <div v-if="recentReports.length > 0 && !isEditMode" class="card bg-white mt-6">
-        <h3 class="font-bold text-gray-800 mb-4">Laporan Terbaru Anda</h3>
+        <h3 class="font-bold text-gray-800 mb-4">Catatan Terbaru Anda</h3>
         <div class="space-y-3">
           <div v-for="report in recentReports.slice(0, 3)" :key="report.id"
             class="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-150">
@@ -231,7 +231,7 @@
               </div>
             </div>
             <button @click="editReport(report)" class="text-gray-400 hover:text-primary transition-colors"
-              title="Edit laporan ini">
+              title="Edit catatan ini">
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path
                   d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -256,7 +256,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="text-xs mt-1">Lapor</span>
+          <span class="text-xs mt-1">Catat</span>
         </router-link>
 
         <router-link to="/timeline" class="flex flex-col items-center text-gray-500 hover:text-primary">
@@ -519,7 +519,19 @@ const submitReport = async () => {
     }
 
     if (result.success) {
-      toast.success(isEditMode.value ? 'Laporan berhasil diperbarui!' : 'Laporan berhasil disimpan!');
+      toast.success(isEditMode.value ? 'Catatan berhasil diperbarui!' : 'Catatan berhasil disimpan!',
+      { position: "top-center",
+        timeout: 5000,
+        closeOnClick: true,
+        pauseOnFocusLoss: true,
+        pauseOnHover: true,
+        draggable: true,
+        draggablePercent: 0.6,
+        showCloseButtonOnHover: false,
+        hideProgressBar: true,
+        closeButton: "button",
+        icon: true,
+        rtl: false});
 
       if (isEditMode.value) {
         router.push('/edit')
@@ -528,11 +540,11 @@ const submitReport = async () => {
         await loadRecentReports()
       }
     } else {
-      toast.error('Gagal menyimpan laporan: ' + result.error);
+      toast.error('Gagal menyimpan catatan: ' + result.error);
     }
   } catch (error) {
     console.error('Submit error:', error)
-    toast.error('Terjadi kesalahan saat menyimpan laporan');
+    toast.error('Terjadi kesalahan saat menyimpan catatan');
   } finally {
     isSubmitting.value = false
   }
@@ -569,7 +581,7 @@ const loadReportForEdit = async (reportId) => {
     editReport(data)
   } catch (error) {
     console.error('Error loading report for edit:', error)
-    alert('Gagal memuat data laporan untuk diedit')
+    alert('Gagal memuat data catatan untuk diedit')
   }
 }
 

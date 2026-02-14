@@ -50,12 +50,12 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         let progressScore = 0
         
         if (report.report_type === 'juz') {
-          // Untuk laporan juz, gunakan surah dan ayat terakhir dari juz tersebut
+          // Untuk catatan juz, gunakan surah dan ayat terakhir dari juz tersebut
           const { surahName, ayatEnd } = getSurahAndAyatFromJuz(report.juz)
           const progress = calculateProgress(surahName, ayatEnd)
           progressScore = progress.score
         } else if (report.report_type === 'surah' && report.surah_name && report.ayat_end) {
-          // Untuk laporan surah, hitung langsung
+          // Untuk catatan surah, hitung langsung
           const progress = calculateProgress(report.surah_name, report.ayat_end)
           progressScore = progress.score
         }

@@ -20,7 +20,7 @@
           </div>
         </div>
         
-        <!-- Action Menu (hanya untuk laporan sendiri) -->
+        <!-- Action Menu (hanya untuk catatan sendiri) -->
         <div v-if="isOwnReport" class="relative">
           <button 
             @click="showMenu = !showMenu"
@@ -40,7 +40,7 @@
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
               </svg>
-              Edit Laporan
+              Edit Catatan
             </button>
             <button 
               @click="deleteReport"
@@ -49,7 +49,7 @@
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
               </svg>
-              Hapus Laporan
+              Hapus Catatan
             </button>
           </div>
         </div>
@@ -288,13 +288,13 @@
   
   const deleteReport = async () => {
     showMenu.value = false
-    if (!confirm('Apakah Anda yakin ingin menghapus laporan ini?')) return
+    if (!confirm('Apakah Anda yakin ingin menghapus catatan ini?')) return
     
     const result = await reportsStore.deleteReport(props.report.id)
     if (result.success) {
-      alert('✅ Laporan berhasil dihapus')
+      alert('✅ Catatan berhasil dihapus')
     } else {
-      alert('❌ Gagal menghapus laporan: ' + result.error)
+      alert('❌ Gagal menghapus catatan: ' + result.error)
     }
   }
   

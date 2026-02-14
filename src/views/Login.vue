@@ -3,8 +3,8 @@
     <div class="w-full max-w-md">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-emerald-600">Khabar Qurma</h1>
-        <p class="text-gray-500 mt-2">Laporkan progres tilawah Anda, raih berkah bersama.</p>
+        <h1 class="text-4xl font-bold text-emerald-600">Khatam Bareng Skrt</h1>
+        <p class="text-gray-500 mt-2">Catat progres tilawah Anda, raih berkah bersama.</p>
       </div>
 
       <div class="bg-white rounded-2xl shadow-xl p-8">

@@ -112,10 +112,10 @@
           <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
           </svg>
-          <h3 class="text-xl font-bold text-gray-700 mb-2">Belum ada laporan</h3>
-          <p class="text-gray-500 mb-6">Jadilah yang pertama melaporkan tilawah!</p>
+          <h3 class="text-xl font-bold text-gray-700 mb-2">Belum ada catatan</h3>
+          <p class="text-gray-500 mb-6">Jadilah yang pertama mencatat tilawah!</p>
           <button @click="goToReport" class="btn-primary px-6 py-2">
-            Laporkan Tilawah
+            Catat Tilawah
           </button>
         </div>
   
@@ -193,7 +193,7 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            <span class="text-xs mt-1">Lapor</span>
+            <span class="text-xs mt-1">Catat</span>
             </router-link>
 
             <router-link 
@@ -468,9 +468,9 @@
     if (result.success) {
         // Remove from local state
         allReports.value = allReports.value.filter(r => r.id !== reportId)
-        alert('✅ Laporan berhasil dihapus')
+        alert('✅ Catatan berhasil dihapus')
     } else {
-        alert('❌ Gagal menghapus laporan: ' + result.error)
+        alert('❌ Gagal menghapus catatan: ' + result.error)
     }
     }
 

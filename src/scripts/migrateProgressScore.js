@@ -35,7 +35,7 @@ async function migrateExistingReports() {
         juz = getJuzFromSurahAndAyat(report.surah_name, report.ayat_end)
       }
     } else if (report.report_type === 'juz' && report.juz) {
-      // Untuk laporan juz, cari surah dan ayat terakhir
+      // Untuk catatan juz, cari surah dan ayat terakhir
       const juzInfo = getSurahAndAyatFromJuz(report.juz)
       const surah = surahs.find(s => s.name === juzInfo.surahName)
       surahId = surah ? surah.id : 0

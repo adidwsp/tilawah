@@ -151,7 +151,7 @@
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h3 class="text-xl font-bold text-gray-700 mb-2">Belum ada data</h3>
-          <p class="text-gray-500">Mulai laporkan tilawah untuk muncul di leaderboard!</p>
+          <p class="text-gray-500">Mulai catat tilawah untuk muncul di leaderboard!</p>
         </div>
 
         <!-- Table -->
@@ -209,7 +209,7 @@
                       </span>
                     </div>
                     <div class="text-xs text-gray-500">
-                      {{ user.report_type === 'juz' ? 'Laporan Juz' : 'Laporan Surah' }}
+                      {{ user.report_type === 'juz' ? 'Catatan Juz' : 'Catatan Surah' }}
                     </div>
                   </div>
                 </td>
@@ -299,7 +299,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="text-xs mt-1">Lapor</span>
+          <span class="text-xs mt-1">Catat</span>
         </router-link>
 
         <router-link to="/timeline" class="flex flex-col items-center text-gray-500 hover:text-primary">
