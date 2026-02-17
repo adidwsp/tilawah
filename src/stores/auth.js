@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   // Getters
   const isAuthenticated = computed(() => !!user.value)
   const currentUser = computed(() => user.value)
+  const currentUserGender = computed(() => user.value?.gender)
 
   // Actions
 
@@ -41,7 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Handles user registration.
    */
-  const register = async ({ username, fullName, phoneNumber }) => {
+  const register = async ({ username, fullName, phoneNumber, gender }) => {
     isLoading.value = true
     error.value = null
     try {
@@ -76,9 +77,10 @@ export const useAuthStore = defineStore('auth', () => {
         .insert([{ 
           username, 
           full_name: fullName, 
-          phone: phoneNumber 
+          phone: phoneNumber, 
+          gender 
         }])
-        .select()
+        .select('*') // Select all fields to get gender back
         .single()
 
       if (createError) throw createError
@@ -158,6 +160,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Getters
     isAuthenticated,
     currentUser,
+    currentUserGender,
 
     // Actions
     initializeAuth,

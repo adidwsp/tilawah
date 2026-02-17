@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase/client'
-
+import { useAuthStore } from './auth'
 import { getJuzFromSurahAndAyat, getSurahAndAyatFromJuz } from '../utils/juzCalculator'
 
 export const useReportsStore = defineStore('reports', () => {
@@ -9,6 +9,7 @@ export const useReportsStore = defineStore('reports', () => {
   const reports = ref([])
   const isLoading = ref(false)
   const error = ref(null)
+  const authStore = useAuthStore()
 
   // Getters
   const todayReports = computed(() => {
@@ -36,17 +37,60 @@ export const useReportsStore = defineStore('reports', () => {
       isLoading.value = true
       error.value = null
 
-      const { data, error: supabaseError } = await supabase
-        .from('reports')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
+      let query = supabase.from('reports').select('*')
+
+      if (userId) {
+        query = query.eq('user_id', userId)
+      }
+      
+      query = query.order('created_at', { ascending: false })
+
+      const { data, error: supabaseError } = await query
 
       if (supabaseError) throw supabaseError
       reports.value = data || []
       return data
     } catch (err) {
       console.error('Error fetching reports:', err)
+      error.value = err.message
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const fetchTimelineReports = async () => {
+    try {
+      isLoading.value = true
+      error.value = null
+
+      const userGender = authStore.currentUserGender
+      if (!userGender) {
+        reports.value = []
+        return
+      }
+
+      const { data, error: supabaseError } = await supabase
+        .from('reports')
+        .select(`
+          *,
+          users!inner(
+            id,
+            username,
+            full_name,
+            avatar_url,
+            gender
+          )
+        `)
+        .eq('users.gender', userGender)
+        .order('created_at', { ascending: false })
+        .limit(50) // Limit to the last 50 reports for performance
+
+      if (supabaseError) throw supabaseError
+      reports.value = data || []
+      return data
+    } catch (err) {
+      console.error('Error fetching timeline reports:', err)
       error.value = err.message
       return []
     } finally {
@@ -61,7 +105,6 @@ const createReport = async (reportData) => {
 
     let processedData = { ...reportData }
 
-    // Jika report type adalah surah, hitung juz secara otomatis
     if (reportData.report_type === 'surah' && reportData.surah_name && reportData.ayat_end) {
       processedData.juz = getJuzFromSurahAndAyat(
         reportData.surah_name, 
@@ -69,7 +112,6 @@ const createReport = async (reportData) => {
       )
     }
     
-    // Jika report type adalah juz, tentukan surah dan ayat terakhir
     if (reportData.report_type === 'juz' && reportData.juz) {
       const juzInfo = getSurahAndAyatFromJuz(reportData.juz)
       processedData.surah_name = juzInfo.surahName
@@ -87,7 +129,6 @@ const createReport = async (reportData) => {
         ayat_start: processedData.ayat_start,
         ayat_end: processedData.ayat_end,
         notes: processedData.notes,
-        // Tambah created_at untuk sorting
         created_at: new Date().toISOString()
       }])
       .select()
@@ -106,7 +147,6 @@ const createReport = async (reportData) => {
   }
 }
 
-// Update juga updateReport function dengan logika yang sama
 const updateReport = async (reportId, reportData) => {
   try {
     isLoading.value = true
@@ -114,7 +154,6 @@ const updateReport = async (reportId, reportData) => {
 
     let processedData = { ...reportData }
 
-    // Logika auto-calculate yang sama
     if (reportData.report_type === 'surah' && reportData.surah_name && reportData.ayat_end) {
       processedData.juz = getJuzFromSurahAndAyat(
         reportData.surah_name, 
@@ -173,7 +212,6 @@ const updateReport = async (reportId, reportData) => {
   
       if (supabaseError) throw supabaseError
       
-      // Remove from local state
       const index = reports.value.findIndex(r => r.id === reportId)
       if (index !== -1) {
         reports.value.splice(index, 1)
@@ -190,18 +228,14 @@ const updateReport = async (reportId, reportData) => {
   }
 
   return {
-    // State
     reports,
     isLoading,
     error,
-
-    // Getters
     todayReports,
     totalJuzCompleted,
     averageDailyJuz,
-
-    // Actions
     fetchUserReports,
+    fetchTimelineReports,
     createReport,
     updateReport,
     deleteReport,

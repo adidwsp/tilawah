@@ -12,24 +12,8 @@
             </svg>
           </button>
           <div>
-            <h1 class="text-2xl font-bold">Leaderboard</h1>
+            <h1 class="text-2xl font-bold">Leaderboard ({{ authStore.currentUserGender === 'laki-laki' ? 'Ikhwan' : 'Akhwat' }})</h1>
             <p class="text-emerald-100">Peringkat Berdasarkan Progress Terakhir</p>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="flex justify-around text-center">
-          <div>
-            <div class="text-2xl font-bold">{{ stats.totalUsers }}</div>
-            <div class="text-sm text-emerald-100">Total User</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold">{{ stats.activeToday }}</div>
-            <div class="text-sm text-emerald-100">Aktif Hari Ini</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold">{{ leaderboard.length }}</div>
-            <div class="text-sm text-emerald-100">Peserta</div>
           </div>
         </div>
       </div>
@@ -128,24 +112,14 @@
       <div class="card">
         <h2 class="text-xl font-bold mb-4 text-gray-800">Peringkat Lengkap</h2>
 
-        <!-- Filter -->
-        <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-          <button v-for="period in timePeriods" :key="period.id" @click="selectPeriod(period.id)"
-            class="flex-shrink-0 px-4 py-2 rounded-full transition-all duration-200" :class="selectedPeriod === period.id
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
-            {{ period.label }}
-          </button>
-        </div>
-
         <!-- Loading State -->
-        <div v-if="isLoading" class="text-center py-8">
+        <div v-if="leaderboardStore.isLoading" class="text-center py-8">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p class="text-gray-600">Memuat peringkat...</p>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="rankedLeaderboard.length === 0" class="text-center py-8">
+        <div v-else-if="leaderboardStore.rankedLeaderboard.length === 0" class="text-center py-8">
           <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -254,35 +228,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Progress Legend -->
-      <div class="mt-6 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
-        <h4 class="font-bold text-gray-800 mb-3">Cara Perangkingan:</h4>
-        <div class="space-y-2 text-sm text-gray-600">
-          <div class="flex items-start gap-2">
-            <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mt-0.5">1
-            </div>
-            <div>Prioritas utama: <span class="font-medium text-gray-800">Juz terakhir</span></div>
-          </div>
-          <div class="flex items-start gap-2">
-            <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs mt-0.5">
-              2</div>
-            <div>Prioritas kedua: <span class="font-medium text-gray-800">Surah terakhir</span> (urutan dalam Al-Quran)
-            </div>
-          </div>
-          <div class="flex items-start gap-2">
-            <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs mt-0.5">3
-            </div>
-            <div>Prioritas ketiga: <span class="font-medium text-gray-800">Ayat terakhir</span> dalam surah</div>
-          </div>
-          <div class="mt-3 pt-3 border-t border-gray-200">
-            <div class="text-xs text-gray-500">
-              <span class="font-medium">Contoh:</span> User di Juz 3, Surah Ali Imran:92 lebih tinggi dari User di Juz
-              3, Surah Al-Baqarah:252
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -323,44 +268,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useLeaderboardStore } from '../stores/leaderboard'
-import { supabase } from '../supabase/client'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const leaderboardStore = useLeaderboardStore()
 
-const leaderboard = ref([])
-
-// State
-const isLoading = ref(true)
-const selectedPeriod = ref('all') // 'all', 'today', 'week', 'month'
-
-// Time periods
-const timePeriods = ref([
-  { id: 'all', label: 'Semua Waktu' },
-  { id: 'today', label: 'Hari Ini' },
-  { id: 'week', label: '7 Hari Terakhir' },
-  { id: 'month', label: '30 Hari Terakhir' }
-])
-
-// Stats
-const stats = ref({
-  totalUsers: 0,
-  activeToday: 0
-})
-
 // Computed
 const currentUser = computed(() => authStore.user)
 
 const rankedLeaderboard = computed(() => {
-  return leaderboardStore.rankedLeaderboard.map((user, index) => ({
-    ...user,
-    rank: index + 1
-  }))
+  return leaderboardStore.rankedLeaderboard
 })
 
 const top3 = computed(() => rankedLeaderboard.value.slice(0, 3))
@@ -373,13 +294,6 @@ const currentUserRank = computed(() => {
 // Methods
 const goBack = () => {
   router.push('/dashboard')
-}
-
-const selectPeriod = (period) => {
-  selectedPeriod.value = period
-  // TODO: Implement period filtering
-  // For now, just refetch all data
-  loadLeaderboard()
 }
 
 const calculateKhatamPercentage = (juz) => {
@@ -411,41 +325,6 @@ const formatDate = (dateString) => {
   })
 }
 
-const loadStats = async () => {
-  try {
-    // Get total users
-    const { count: totalUsers } = await supabase
-      .from('users')
-      .select('*', { count: 'exact', head: true })
-
-    // Get active users today
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    const { data: todayReports } = await supabase
-      .from('reports')
-      .select('user_id')
-      .gte('created_at', today.toISOString())
-
-    const activeUserIds = new Set(todayReports?.map(r => r.user_id) || [])
-    const activeToday = activeUserIds.size
-
-    stats.value = {
-      totalUsers: totalUsers || 0,
-      activeToday
-    }
-  } catch (error) {
-    console.error('Error loading stats:', error)
-  }
-}
-
-const loadLeaderboard = async () => {
-  isLoading.value = true
-  await leaderboardStore.fetchLeaderboard()
-  await loadStats()
-  isLoading.value = false
-}
-
 // Lifecycle
 onMounted(async () => {
   if (!authStore.user) {
@@ -456,12 +335,7 @@ onMounted(async () => {
     }
   }
 
-  await loadLeaderboard()
-})
-
-// Watch for period changes
-watch(selectedPeriod, () => {
-  loadLeaderboard()
+  await leaderboardStore.fetchLeaderboard()
 })
 </script>
 

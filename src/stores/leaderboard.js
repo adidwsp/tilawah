@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '../supabase/client'
+import { useAuthStore } from './auth'
 import { calculateProgress, sortUsersByProgress, getSurahAndAyatFromJuz } from '../utils/juzCalculator'
 
 export const useLeaderboardStore = defineStore('leaderboard', () => {
   const leaderboard = ref([])
   const isLoading = ref(false)
   const error = ref(null)
+  const authStore = useAuthStore()
 
   // Fetch leaderboard data
   const fetchLeaderboard = async () => {
@@ -14,7 +16,14 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
       isLoading.value = true
       error.value = null
 
-      // Fetch semua reports dengan data user
+      const userGender = authStore.currentUserGender
+
+      if (!userGender) {
+        leaderboard.value = []
+        return
+      }
+
+      // Fetch all reports with user data, filtering by the current user's gender
       const { data: reports, error: reportsError } = await supabase
         .from('reports')
         .select(`
@@ -29,14 +38,18 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
           users!inner (
             id,
             username,
-            created_at
+            full_name,
+            avatar_url,
+            created_at,
+            gender
           )
         `)
+        .eq('users.gender', userGender) // Filter by gender
         .order('created_at', { ascending: false })
 
       if (reportsError) throw reportsError
 
-      // Kelompokkan by user dan ambil report terbaru
+      // Group by user and get the latest report
       const userLatestReports = {}
       reports.forEach(report => {
         if (!userLatestReports[report.user_id] || 
@@ -45,17 +58,15 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         }
       })
 
-      // Hitung progress untuk setiap user
+      // Calculate progress for each user
       const usersWithProgress = Object.values(userLatestReports).map(report => {
         let progressScore = 0
         
         if (report.report_type === 'juz') {
-          // Untuk catatan juz, gunakan surah dan ayat terakhir dari juz tersebut
           const { surahName, ayatEnd } = getSurahAndAyatFromJuz(report.juz)
           const progress = calculateProgress(surahName, ayatEnd)
           progressScore = progress.score
         } else if (report.report_type === 'surah' && report.surah_name && report.ayat_end) {
-          // Untuk catatan surah, hitung langsung
           const progress = calculateProgress(report.surah_name, report.ayat_end)
           progressScore = progress.score
         }
@@ -75,7 +86,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         }
       })
 
-      // Urutkan berdasarkan progress score
+      // Sort by progress score
       leaderboard.value = sortUsersByProgress(usersWithProgress)
       
     } catch (err) {
@@ -86,7 +97,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     }
   }
 
-  // Getter untuk ranking dengan posisi
+  // Getter for ranked leaderboard
   const rankedLeaderboard = computed(() => {
     return leaderboard.value.map((user, index) => ({
       ...user,
@@ -94,10 +105,10 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     }))
   })
 
-  // Getter untuk top 10
+  // Getter for top 10
   const top10 = computed(() => rankedLeaderboard.value.slice(0, 10))
 
-  // Getter untuk current user position
+  // Getter for current user position
   const getUserRank = (userId) => {
     const userIndex = leaderboard.value.findIndex(user => user.user_id === userId)
     return userIndex !== -1 ? userIndex + 1 : null

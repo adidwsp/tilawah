@@ -81,6 +81,20 @@
                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
+            
+            <div class="mb-4">
+              <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+              <select 
+                id="gender" 
+                v-model="registerGender"
+                required
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              >
+                <option value="" disabled>Pilih</option>
+                <option value="laki-laki">Laki-laki (Ikhwan)</option>
+                <option value="perempuan">Perempuan (Akhwat)</option>
+              </select>
+            </div>
 
             <div class="mb-4">
               <label for="register-phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
@@ -137,6 +151,7 @@ const loginUsername = ref('')
 const registerFullName = ref('')
 const registerUsername = ref('')
 const registerPhoneNumber = ref('')
+const registerGender = ref('')
 const phoneError = ref('')
 
 // Clear errors when tab changes
@@ -178,7 +193,7 @@ const handleLogin = async () => {
 const handleRegister = async () => {
   if (phoneError.value) return;
   
-  if (!registerFullName.value || !registerUsername.value || !registerPhoneNumber.value) {
+  if (!registerFullName.value || !registerUsername.value || !registerPhoneNumber.value || !registerGender.value) {
     authStore.error = 'Semua field wajib diisi.'
     return
   }
@@ -186,7 +201,8 @@ const handleRegister = async () => {
   const result = await authStore.register({
     fullName: registerFullName.value,
     username: registerUsername.value,
-    phoneNumber: `62${registerPhoneNumber.value}`
+    phoneNumber: `62${registerPhoneNumber.value}`,
+    gender: registerGender.value
   })
 
   if (result.success) {
