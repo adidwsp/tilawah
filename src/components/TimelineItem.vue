@@ -10,7 +10,7 @@
           
           <!-- User Info -->
           <div>
-            <div class="font-bold text-gray-800">{{ userName }}</div>
+            <div class="font-bold text-gray-800">{{ full_name }}</div>
             <div class="text-xs text-gray-500 flex items-center gap-1">
               <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
@@ -148,12 +148,12 @@
             class="flex items-start gap-2 p-2 bg-gray-50 rounded-lg"
           >
             <div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
-              {{ comment.users?.username?.charAt(0).toUpperCase() || 'U' }}
+              {{ comment.users?.full_name?.charAt(0).toUpperCase() || 'U' }}
             </div>
             <div class="flex-1">
               <div class="flex justify-between items-start">
                 <div>
-                  <span class="text-xs font-semibold text-gray-700">{{ comment.users?.username || 'User' }}</span>
+                  <span class="text-xs font-semibold text-gray-700">{{ comment.users?.full_name || 'User' }}</span>
                   <span class="text-xs text-gray-500 ml-2">{{ formatCommentTime(comment.created_at) }}</span>
                 </div>
                 <button 
@@ -199,11 +199,11 @@
   
   // Computed
   const userInitial = computed(() => {
-    return props.report.users?.username?.charAt(0).toUpperCase() || 'U'
+    return props.report.users?.full_name?.charAt(0).toUpperCase() || 'U'
   })
   
-  const userName = computed(() => {
-    return props.report.users?.username || 'User'
+  const full_name = computed(() => {
+    return props.report.users?.full_name || 'User'
   })
   
   const isOwnReport = computed(() => {

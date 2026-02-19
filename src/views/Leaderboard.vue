@@ -30,7 +30,7 @@
               #{{ currentUserRank.rank }}
             </div>
             <div>
-              <p class="font-bold text-gray-800">{{ currentUserRank.username }}</p>
+              <p class="font-bold text-gray-800">{{ currentUserRank.full_name }}</p>
               <p class="text-sm text-gray-600 flex items-center gap-2">
                 <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
                   Juz {{ currentUserRank.juz }}
@@ -61,7 +61,7 @@
               2
             </div>
             <div class="w-full bg-white rounded-2xl shadow-lg p-4 text-center">
-              <div class="font-bold text-gray-700 truncate">{{ top3[1].username }}</div>
+              <div class="font-bold text-gray-700 truncate">{{ top3[1].full_name }}</div>
               <div class="text-2xl font-bold text-gray-600 mt-2">Juz {{ top3[1].juz }}</div>
               <div class="text-xs text-gray-500 truncate">{{ top3[1].surah_name }}:{{ top3[1].ayat_end }}</div>
               <div class="text-xs text-emerald-600 mt-1 font-medium">
@@ -81,7 +81,7 @@
             </div>
             <div
               class="w-full bg-gradient-to-b from-yellow-50 to-yellow-100 rounded-2xl shadow-xl p-4 text-center border-2 border-yellow-200">
-              <div class="font-bold text-gray-800 truncate">{{ top3[0].username }}</div>
+              <div class="font-bold text-gray-800 truncate">{{ top3[0].full_name }}</div>
               <div class="text-3xl font-bold text-gray-800 mt-2">Juz {{ top3[0].juz }}</div>
               <div class="text-sm text-gray-600 truncate">{{ top3[0].surah_name }}:{{ top3[0].ayat_end }}</div>
               <div class="text-sm font-semibold text-emerald-700 mt-1">
@@ -97,7 +97,7 @@
               3
             </div>
             <div class="w-full bg-white rounded-2xl shadow-lg p-4 text-center">
-              <div class="font-bold text-gray-700 truncate">{{ top3[2].username }}</div>
+              <div class="font-bold text-gray-700 truncate">{{ top3[2].full_name }}</div>
               <div class="text-2xl font-bold text-gray-600 mt-2">Juz {{ top3[2].juz }}</div>
               <div class="text-xs text-gray-500 truncate">{{ top3[2].surah_name }}:{{ top3[2].ayat_end }}</div>
               <div class="text-xs text-emerald-600 mt-1 font-medium">

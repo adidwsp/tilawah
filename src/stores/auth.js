@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('auth', () => {
       // 2. Check for duplicate username or phone number
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
-        .select('username, phone')
+        .select('username, phone, full_name')
         .or(`username.eq.${username}`, `phone.eq.${phoneNumber}`)
         .single()
 

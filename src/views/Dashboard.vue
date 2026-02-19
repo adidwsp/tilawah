@@ -9,7 +9,7 @@
         <div class="flex justify-between items-center mb-4">
           <div>
             <h1 class="text-2xl font-bold">Khatam Bareng Skrt</h1>
-            <p class="text-emerald-100">Selamat datang, {{ user?.username || 'User' }}</p>
+            <p class="text-emerald-100">Selamat datang, {{ user?.full_name || 'User' }}</p>
           </div>
           <button @click="handleLogout"
             class="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition-all duration-200">
@@ -315,7 +315,7 @@
                   {{ index + 1 }}
                 </div>
                 <div>
-                  <div class="font-bold text-gray-800">{{ user.username }}</div>
+                  <div class="font-bold text-gray-800">{{ user.full_name }}</div>
                   <div class="text-sm text-gray-600">{{ user.total_juz }} Juz</div>
                 </div>
               </div>
